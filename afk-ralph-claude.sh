@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+DATETIME=$(date +"%d.%m.%Y %H:%M")
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+exec > >(tee -a "$HOME/log/ralph.log") 2>&1
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -108,9 +111,9 @@ fi
 
 for ((i=1; i<=ITERATIONS; i++)); do
   echo
-  echo "===================================================="
-  echo "Ralph iteration $i / $ITERATIONS | model: $CLAUDE_MODEL | effort: $CLAUDE_EFFORT"
-  echo "===================================================="
+  echo "======================================================================"
+  echo "$DATETIME | Ralph iteration $i / $ITERATIONS | model: $CLAUDE_MODEL | effort: $CLAUDE_EFFORT"
+  echo "======================================================================"
 
   timestamp="$(date +"%Y-%m-%dT%H-%M-%S")"
   run_log="$LOG_DIR/ralph-$timestamp.log"
@@ -259,4 +262,5 @@ AGENT_EOF
 done
 
 echo
-echo "Ralph loop finished after $ITERATIONS iterations."
+echo "$DATETIME | Ralph loop finished after $ITERATIONS iterations."
+
