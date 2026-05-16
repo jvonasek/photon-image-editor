@@ -245,7 +245,7 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
       <header className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Image Editor</h1>
+        <h1 className="text-2xl font-bold">Photon Image Editor</h1>
         <ThemeToggle />
       </header>
 
