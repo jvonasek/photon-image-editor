@@ -13,7 +13,7 @@ You must follow repository rules from `AGENT.md`.
 
 This repository is a full-stack monorepo:
 
-- `apps/web` contains the Next.js App Router frontend
+- `apps/web` contains the Vite frontend
 - `apps/api` contains the FastAPI backend
 
 The current task may affect the web app, the API, or both. Touch only the app(s) required for the issue and keep shared behavior consistent across the boundary when a task spans both.
@@ -179,7 +179,7 @@ This run is successful only if:
 4. relevant tests were added or updated if needed
 5. validation was run
 6. progress files were updated
-7. changes are committed to main
+7. changes are committed and pushed to main
 8. changes are reviewable and scoped
 
 If any of the above is not true, do not return `DONE`.
@@ -238,9 +238,9 @@ Do not output anything outside this structure except minimal necessary execution
 
 ---
 
-## Commit (Mandatory)
+## Commit and Push (Mandatory)
 
-After the task is complete and validation passes, you MUST commit your changes. This is not optional.
+After the task is complete and validation passes, you MUST commit and push your changes. This is not optional.
 
 ### Steps:
 
@@ -264,7 +264,14 @@ After the task is complete and validation passes, you MUST commit your changes. 
    - `fix(listings): validate compensation type`
    - `test(profiles): cover recruiter visibility rules`
 
-Do not create feature branches
+4. **Push** directly to main:
+   ```
+   git push origin main
+   ```
+
+5. **Verify** the push succeeded. If it fails, include the error in your final output.
+
+Do not create feature branches — push directly to main.
 Do not create unrelated commits.
 Do not skip the commit step — uncommitted work is equivalent to not doing the task.
 
@@ -272,6 +279,7 @@ Do not skip the commit step — uncommitted work is equivalent to not doing the 
 - Fix the issues reported by the hooks
 - Re-stage the fixed files
 - Create a NEW commit (do not amend)
+- Push again
 
 ---
 

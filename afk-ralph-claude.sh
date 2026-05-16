@@ -143,7 +143,7 @@ for ((i=1; i<=ITERATIONS; i++)); do
 
   agent_prompt="$(cat <<'AGENT_EOF'
 Read AGENT.md, PROMPT.md, and state/current-task.md before doing anything.
-This repository is a monorepo with apps/web (Next.js) and apps/api (FastAPI).
+This repository is a monorepo with apps/web (Vite) and apps/api (FastAPI).
 Implement exactly the issue described in state/current-task.md.
 Touch only the app(s) required for the issue and keep web/api contracts in sync when needed.
 Do not work on any other issue.

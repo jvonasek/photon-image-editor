@@ -190,7 +190,7 @@ A task is DONE only if all of the following are true:
 4. Relevant validation was run.
 5. No unrelated work was included.
 6. Progress/state files were updated.
-7. Changes are committed to `main`.
+7. Changes are committed and pushed to `main`.
 8. The change is ready for review.
 
 If any of the above is not true, do not mark the task as DONE.
@@ -295,13 +295,15 @@ Keep observability and operability in mind, but do not add heavy infra unless th
 
 ## Git and Commit Rules (Mandatory)
 
-Make concise, reviewable changes. **You MUST commit before finishing the loop.** Uncommitted work is equivalent to not doing the task.
+Make concise, reviewable changes. **You MUST commit and push before finishing the loop.** Uncommitted work is equivalent to not doing the task.
 
 ### Required steps after validation passes:
 
 1. Ensure you are on `main`
 2. Stage only the files you changed for this task (no `git add -A` or `git add .`)
 3. Commit with a conventional scoped message
+4. Push to remote with `git push origin main`
+5. Verify the push succeeded
 
 Commit message style:
 - `feat(projects): add project follow endpoint`
