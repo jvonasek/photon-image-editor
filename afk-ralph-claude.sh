@@ -16,7 +16,7 @@ fi
 # Defaults from settings.json
 CLAUDE_SETTINGS="${HOME}/.claude/settings.json"
 CLAUDE_MODEL="opus"
-CLAUDE_EFFORT="high"
+CLAUDE_EFFORT="medium"
 if [ -f "$CLAUDE_SETTINGS" ]; then
   _model="$(jq -r '.model // empty' "$CLAUDE_SETTINGS")"
   _effort="$(jq -r '.effortLevel // empty' "$CLAUDE_SETTINGS")"
