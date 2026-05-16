@@ -7,8 +7,10 @@ import { usePhoton } from '@/hooks/usePhoton'
 import { detectFormat, readFileAsArrayBuffer, getExtension, downloadBlob, bytesToObjectUrl, getImageDimensions } from '@/utils/image'
 import type { ImageFormat, ImageDimensions } from '@/types'
 
+const PREVIEW_DEBOUNCE_MS = 75
+
 function App() {
-  const { isReady, processImage, applyFilterPreview } = usePhoton()
+  const { isReady, processImage, applyAdjustmentsPreview } = usePhoton()
 
   const [originalFile, setOriginalFile] = useState<File | null>(null)
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null)
@@ -22,20 +24,81 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false)
 
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null)
-  const [filterPreviewUrl, setFilterPreviewUrl] = useState<string | null>(null)
+  const [brightness, setBrightness] = useState(0)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const prevEditedUrl = useRef<string | null>(null)
   const prevOriginalUrl = useRef<string | null>(null)
-  const prevFilterPreviewUrl = useRef<string | null>(null)
-  const filterPreviewReqId = useRef(0)
+  const prevPreviewUrl = useRef<string | null>(null)
+  const previewReqId = useRef(0)
+  const previewTimer = useRef<number | null>(null)
 
   useEffect(() => {
     return () => {
       if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
       if (prevOriginalUrl.current) URL.revokeObjectURL(prevOriginalUrl.current)
-      if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
+      if (prevPreviewUrl.current) URL.revokeObjectURL(prevPreviewUrl.current)
+      if (previewTimer.current !== null) window.clearTimeout(previewTimer.current)
     }
   }, [])
+
+  const clearPreview = useCallback(() => {
+    previewReqId.current++
+    if (previewTimer.current !== null) {
+      window.clearTimeout(previewTimer.current)
+      previewTimer.current = null
+    }
+    if (prevPreviewUrl.current) URL.revokeObjectURL(prevPreviewUrl.current)
+    prevPreviewUrl.current = null
+    setPreviewUrl(null)
+  }, [])
+
+  const schedulePreview = useCallback((
+    brightnessValue: number,
+    filterName: string | null,
+    sourceBytesOverride?: Uint8Array,
+  ) => {
+    if (!originalFile) return
+
+    if (brightnessValue === 0 && !filterName) {
+      clearPreview()
+      return
+    }
+
+    if (previewTimer.current !== null) {
+      window.clearTimeout(previewTimer.current)
+    }
+
+    const myId = ++previewReqId.current
+    previewTimer.current = window.setTimeout(async () => {
+      previewTimer.current = null
+      try {
+        let sourceBytes: Uint8Array
+        if (sourceBytesOverride) {
+          sourceBytes = sourceBytesOverride
+        } else if (editedImageBytes) {
+          sourceBytes = editedImageBytes
+        } else {
+          const buf = await readFileAsArrayBuffer(originalFile)
+          sourceBytes = new Uint8Array(buf)
+        }
+
+        const previewBytes = await applyAdjustmentsPreview(
+          sourceBytes,
+          brightnessValue,
+          0,
+          filterName,
+        )
+        if (myId !== previewReqId.current) return
+        const url = bytesToObjectUrl(previewBytes, 'image/png')
+        if (prevPreviewUrl.current) URL.revokeObjectURL(prevPreviewUrl.current)
+        prevPreviewUrl.current = url
+        setPreviewUrl(url)
+      } catch {
+        // ignore preview errors
+      }
+    }, PREVIEW_DEBOUNCE_MS)
+  }, [originalFile, editedImageBytes, applyAdjustmentsPreview, clearPreview])
 
   const handleFileAccepted = useCallback(async (file: File) => {
     const format = detectFormat(file)
@@ -57,12 +120,10 @@ function App() {
     setEditedImageUrl(null)
     prevEditedUrl.current = null
 
-    filterPreviewReqId.current++
     setSelectedFilter(null)
-    if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
-    prevFilterPreviewUrl.current = null
-    setFilterPreviewUrl(null)
-  }, [])
+    setBrightness(0)
+    clearPreview()
+  }, [clearPreview])
 
   const handleCrop = useCallback(async (crop: PixelCrop, displayDimensions: ImageDimensions) => {
     if (!originalFile || !currentDimensions) return
@@ -84,6 +145,7 @@ function App() {
         displayDimensions,
         currentDimensions,
         null,
+        null,
       )
 
       if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
@@ -96,20 +158,15 @@ function App() {
       const newDims = await getImageDimensions(newUrl)
       setCurrentDimensions(newDims)
 
-      if (selectedFilter) {
-        const myId = ++filterPreviewReqId.current
-        const previewBytes = await applyFilterPreview(result, selectedFilter)
-        if (myId === filterPreviewReqId.current) {
-          const previewUrl = bytesToObjectUrl(previewBytes, 'image/png')
-          if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
-          prevFilterPreviewUrl.current = previewUrl
-          setFilterPreviewUrl(previewUrl)
-        }
+      if (brightness !== 0 || selectedFilter) {
+        schedulePreview(brightness, selectedFilter, result)
+      } else {
+        clearPreview()
       }
     } finally {
       setIsProcessing(false)
     }
-  }, [originalFile, editedImageBytes, currentDimensions, inputFormat, processImage, selectedFilter, applyFilterPreview])
+  }, [originalFile, editedImageBytes, currentDimensions, inputFormat, processImage, selectedFilter, brightness, schedulePreview, clearPreview])
 
   const handleResize = useCallback(async (dimensions: ImageDimensions) => {
     if (!originalFile) return
@@ -131,6 +188,7 @@ function App() {
         null,
         null,
         null,
+        null,
       )
 
       if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
@@ -141,56 +199,25 @@ function App() {
       setEditedImageUrl(newUrl)
       setCurrentDimensions(dimensions)
 
-      if (selectedFilter) {
-        const myId = ++filterPreviewReqId.current
-        const previewBytes = await applyFilterPreview(result, selectedFilter)
-        if (myId === filterPreviewReqId.current) {
-          const previewUrl = bytesToObjectUrl(previewBytes, 'image/png')
-          if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
-          prevFilterPreviewUrl.current = previewUrl
-          setFilterPreviewUrl(previewUrl)
-        }
+      if (brightness !== 0 || selectedFilter) {
+        schedulePreview(brightness, selectedFilter, result)
+      } else {
+        clearPreview()
       }
     } finally {
       setIsProcessing(false)
     }
-  }, [originalFile, editedImageBytes, inputFormat, processImage, selectedFilter, applyFilterPreview])
+  }, [originalFile, editedImageBytes, inputFormat, processImage, selectedFilter, brightness, schedulePreview, clearPreview])
 
-  const handleFilterChange = useCallback(async (name: string | null) => {
+  const handleFilterChange = useCallback((name: string | null) => {
     setSelectedFilter(name)
+    schedulePreview(brightness, name)
+  }, [brightness, schedulePreview])
 
-    if (!name) {
-      filterPreviewReqId.current++
-      if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
-      prevFilterPreviewUrl.current = null
-      setFilterPreviewUrl(null)
-      return
-    }
-
-    if (!originalFile) return
-
-    const myId = ++filterPreviewReqId.current
-    setIsProcessing(true)
-    try {
-      let sourceBytes: Uint8Array
-      if (editedImageBytes) {
-        sourceBytes = editedImageBytes
-      } else {
-        const buf = await readFileAsArrayBuffer(originalFile)
-        sourceBytes = new Uint8Array(buf)
-      }
-
-      const previewBytes = await applyFilterPreview(sourceBytes, name)
-      if (myId !== filterPreviewReqId.current) return
-
-      const newUrl = bytesToObjectUrl(previewBytes, 'image/png')
-      if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
-      prevFilterPreviewUrl.current = newUrl
-      setFilterPreviewUrl(newUrl)
-    } finally {
-      if (myId === filterPreviewReqId.current) setIsProcessing(false)
-    }
-  }, [originalFile, editedImageBytes, applyFilterPreview])
+  const handleBrightnessChange = useCallback((value: number) => {
+    setBrightness(value)
+    schedulePreview(value, selectedFilter)
+  }, [selectedFilter, schedulePreview])
 
   const handleDownload = useCallback(async () => {
     if (!originalFile) return
@@ -198,7 +225,7 @@ function App() {
     const baseName = originalFile.name.replace(/\.[^.]+$/, '')
     const filename = `edited-${baseName}.${ext}`
 
-    if (selectedFilter) {
+    if (selectedFilter || brightness !== 0) {
       let sourceBytes: Uint8Array
       if (editedImageBytes) {
         sourceBytes = editedImageBytes
@@ -214,6 +241,7 @@ function App() {
         null,
         null,
         selectedFilter,
+        { brightness, contrast: 0 },
       )
       downloadBlob(result, filename, inputFormat)
       return
@@ -225,22 +253,20 @@ function App() {
       const buf = await originalFile.arrayBuffer()
       downloadBlob(new Uint8Array(buf), filename, inputFormat)
     }
-  }, [originalFile, editedImageBytes, inputFormat, selectedFilter, processImage])
+  }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, processImage])
 
   const handleReset = useCallback(() => {
-    filterPreviewReqId.current++
     if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
     prevEditedUrl.current = null
     setEditedImageBytes(null)
     setEditedImageUrl(null)
-    if (prevFilterPreviewUrl.current) URL.revokeObjectURL(prevFilterPreviewUrl.current)
-    prevFilterPreviewUrl.current = null
-    setFilterPreviewUrl(null)
     setSelectedFilter(null)
+    setBrightness(0)
+    clearPreview()
     if (originalDimensions) setCurrentDimensions(originalDimensions)
-  }, [originalDimensions])
+  }, [originalDimensions, clearPreview])
 
-  const displayUrl = filterPreviewUrl ?? editedImageUrl ?? originalImageUrl
+  const displayUrl = previewUrl ?? editedImageUrl ?? originalImageUrl
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -265,9 +291,11 @@ function App() {
           fileName={originalFile.name}
           isProcessing={isProcessing}
           selectedFilter={selectedFilter}
+          brightness={brightness}
           onCrop={handleCrop}
           onResize={handleResize}
           onFilterChange={handleFilterChange}
+          onBrightnessChange={handleBrightnessChange}
           onDownload={handleDownload}
           onReset={handleReset}
         />

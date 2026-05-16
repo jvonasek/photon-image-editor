@@ -4,6 +4,7 @@ import type { Crop, PixelCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AdjustmentsControls } from './AdjustmentsControls'
 import { CropControls } from './CropControls'
 import { FilterControls } from './FilterControls'
 import { ResizeControls } from './ResizeControls'
@@ -16,9 +17,11 @@ interface ImageEditorProps {
   fileName: string
   isProcessing: boolean
   selectedFilter: string | null
+  brightness: number
   onCrop: (crop: PixelCrop, displayDimensions: ImageDimensions) => void
   onResize: (dimensions: ImageDimensions) => void
   onFilterChange: (name: string | null) => void
+  onBrightnessChange: (value: number) => void
   onDownload: () => void
   onReset: () => void
 }
@@ -30,9 +33,11 @@ export function ImageEditor({
   fileName,
   isProcessing,
   selectedFilter,
+  brightness,
   onCrop,
   onResize,
   onFilterChange,
+  onBrightnessChange,
   onDownload,
   onReset,
 }: ImageEditorProps) {
@@ -92,6 +97,14 @@ export function ImageEditor({
         <FilterControls
           value={selectedFilter}
           onChange={onFilterChange}
+          disabled={isProcessing}
+        />
+
+        <Separator />
+
+        <AdjustmentsControls
+          brightness={brightness}
+          onBrightnessChange={onBrightnessChange}
           disabled={isProcessing}
         />
 
