@@ -25,6 +25,7 @@ function App() {
 
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null)
   const [brightness, setBrightness] = useState(0)
+  const [contrast, setContrast] = useState(0)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const prevEditedUrl = useRef<string | null>(null)
@@ -55,12 +56,13 @@ function App() {
 
   const schedulePreview = useCallback((
     brightnessValue: number,
+    contrastValue: number,
     filterName: string | null,
     sourceBytesOverride?: Uint8Array,
   ) => {
     if (!originalFile) return
 
-    if (brightnessValue === 0 && !filterName) {
+    if (brightnessValue === 0 && contrastValue === 0 && !filterName) {
       clearPreview()
       return
     }
@@ -86,7 +88,7 @@ function App() {
         const previewBytes = await applyAdjustmentsPreview(
           sourceBytes,
           brightnessValue,
-          0,
+          contrastValue,
           filterName,
         )
         if (myId !== previewReqId.current) return
@@ -122,6 +124,7 @@ function App() {
 
     setSelectedFilter(null)
     setBrightness(0)
+    setContrast(0)
     clearPreview()
   }, [clearPreview])
 
@@ -158,15 +161,15 @@ function App() {
       const newDims = await getImageDimensions(newUrl)
       setCurrentDimensions(newDims)
 
-      if (brightness !== 0 || selectedFilter) {
-        schedulePreview(brightness, selectedFilter, result)
+      if (brightness !== 0 || contrast !== 0 || selectedFilter) {
+        schedulePreview(brightness, contrast, selectedFilter, result)
       } else {
         clearPreview()
       }
     } finally {
       setIsProcessing(false)
     }
-  }, [originalFile, editedImageBytes, currentDimensions, inputFormat, processImage, selectedFilter, brightness, schedulePreview, clearPreview])
+  }, [originalFile, editedImageBytes, currentDimensions, inputFormat, processImage, selectedFilter, brightness, contrast, schedulePreview, clearPreview])
 
   const handleResize = useCallback(async (dimensions: ImageDimensions) => {
     if (!originalFile) return
@@ -199,25 +202,30 @@ function App() {
       setEditedImageUrl(newUrl)
       setCurrentDimensions(dimensions)
 
-      if (brightness !== 0 || selectedFilter) {
-        schedulePreview(brightness, selectedFilter, result)
+      if (brightness !== 0 || contrast !== 0 || selectedFilter) {
+        schedulePreview(brightness, contrast, selectedFilter, result)
       } else {
         clearPreview()
       }
     } finally {
       setIsProcessing(false)
     }
-  }, [originalFile, editedImageBytes, inputFormat, processImage, selectedFilter, brightness, schedulePreview, clearPreview])
+  }, [originalFile, editedImageBytes, inputFormat, processImage, selectedFilter, brightness, contrast, schedulePreview, clearPreview])
 
   const handleFilterChange = useCallback((name: string | null) => {
     setSelectedFilter(name)
-    schedulePreview(brightness, name)
-  }, [brightness, schedulePreview])
+    schedulePreview(brightness, contrast, name)
+  }, [brightness, contrast, schedulePreview])
 
   const handleBrightnessChange = useCallback((value: number) => {
     setBrightness(value)
-    schedulePreview(value, selectedFilter)
-  }, [selectedFilter, schedulePreview])
+    schedulePreview(value, contrast, selectedFilter)
+  }, [contrast, selectedFilter, schedulePreview])
+
+  const handleContrastChange = useCallback((value: number) => {
+    setContrast(value)
+    schedulePreview(brightness, value, selectedFilter)
+  }, [brightness, selectedFilter, schedulePreview])
 
   const handleDownload = useCallback(async () => {
     if (!originalFile) return
@@ -225,7 +233,7 @@ function App() {
     const baseName = originalFile.name.replace(/\.[^.]+$/, '')
     const filename = `edited-${baseName}.${ext}`
 
-    if (selectedFilter || brightness !== 0) {
+    if (selectedFilter || brightness !== 0 || contrast !== 0) {
       let sourceBytes: Uint8Array
       if (editedImageBytes) {
         sourceBytes = editedImageBytes
@@ -241,7 +249,7 @@ function App() {
         null,
         null,
         selectedFilter,
-        { brightness, contrast: 0 },
+        { brightness, contrast },
       )
       downloadBlob(result, filename, inputFormat)
       return
@@ -253,7 +261,7 @@ function App() {
       const buf = await originalFile.arrayBuffer()
       downloadBlob(new Uint8Array(buf), filename, inputFormat)
     }
-  }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, processImage])
+  }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, contrast, processImage])
 
   const handleReset = useCallback(() => {
     if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
@@ -262,6 +270,7 @@ function App() {
     setEditedImageUrl(null)
     setSelectedFilter(null)
     setBrightness(0)
+    setContrast(0)
     clearPreview()
     if (originalDimensions) setCurrentDimensions(originalDimensions)
   }, [originalDimensions, clearPreview])
@@ -292,10 +301,12 @@ function App() {
           isProcessing={isProcessing}
           selectedFilter={selectedFilter}
           brightness={brightness}
+          contrast={contrast}
           onCrop={handleCrop}
           onResize={handleResize}
           onFilterChange={handleFilterChange}
           onBrightnessChange={handleBrightnessChange}
+          onContrastChange={handleContrastChange}
           onDownload={handleDownload}
           onReset={handleReset}
         />

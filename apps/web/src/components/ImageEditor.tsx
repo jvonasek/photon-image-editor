@@ -18,10 +18,12 @@ interface ImageEditorProps {
   isProcessing: boolean
   selectedFilter: string | null
   brightness: number
+  contrast: number
   onCrop: (crop: PixelCrop, displayDimensions: ImageDimensions) => void
   onResize: (dimensions: ImageDimensions) => void
   onFilterChange: (name: string | null) => void
   onBrightnessChange: (value: number) => void
+  onContrastChange: (value: number) => void
   onDownload: () => void
   onReset: () => void
 }
@@ -34,10 +36,12 @@ export function ImageEditor({
   isProcessing,
   selectedFilter,
   brightness,
+  contrast,
   onCrop,
   onResize,
   onFilterChange,
   onBrightnessChange,
+  onContrastChange,
   onDownload,
   onReset,
 }: ImageEditorProps) {
@@ -104,7 +108,9 @@ export function ImageEditor({
 
         <AdjustmentsControls
           brightness={brightness}
+          contrast={contrast}
           onBrightnessChange={onBrightnessChange}
+          onContrastChange={onContrastChange}
           disabled={isProcessing}
         />
 
