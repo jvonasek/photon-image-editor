@@ -39,6 +39,13 @@
 - Validation: `bun run lint` / `bun run build` -- pre-existing errors only (ResizeControls effect rule, ui/button + ui/toggle fast-refresh, `utils/image.ts` Uint8Array Blob typing). No new errors introduced by this change.
 - Status: DONE.
 
+## 2026-05-16 -- RAZ-28
+
+- Task: bake blur into final-export (`processImage`) pipeline.
+- Outcome: BLOCKED. Prerequisite RAZ-27 (wire blur through state, UI, live-preview) is not implemented — no `blur` references exist anywhere in `apps/web/src`, no blur parameter on `processImage`/`applyAdjustmentsPreview`, no blur state in `App.tsx`, no blur control in `AdjustmentsControls`. See `state/blockers.md`.
+- Validation: none run (no code changes).
+- Status: BLOCKED.
+
 ## 2026-05-16 -- RAZ-25
 
 - Added second `Contrast` slider to `apps/web/src/components/AdjustmentsControls.tsx` mirroring Brightness UI (range -100..100, step 1, click-numeric-to-reset, disabled while processing).
@@ -47,3 +54,9 @@
 - Pipeline order unchanged: crop → resize → brightness → contrast → filter → encode (already correct from RAZ-24; `applyAdjustments` applies brightness before contrast).
 - Validation: `bun run lint` / `bun run build` -- pre-existing errors only (ResizeControls effect rule, ui/button + ui/toggle fast-refresh, `utils/image.ts` Uint8Array Blob typing). No new errors introduced.
 - Status: DONE.
+
+## 2026-05-16 -- RAZ-28 (re-check)
+
+- Re-verified blocker on RAZ-28. Grep for `blur` (case-insensitive) over `apps/web/src` still returns zero matches. `usePhoton.ts` has no blur parameter; `App.tsx` has no `blur` state; `AdjustmentsControls.tsx` has no blur control. RAZ-27 still not implemented.
+- No code changes made this iteration. Existing blockers entry remains accurate.
+- Status: BLOCKED.
