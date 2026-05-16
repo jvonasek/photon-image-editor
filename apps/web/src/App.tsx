@@ -242,7 +242,7 @@ function App() {
     const baseName = originalFile.name.replace(/\.[^.]+$/, '')
     const filename = `edited-${baseName}.${ext}`
 
-    if (selectedFilter || brightness !== 0 || contrast !== 0) {
+    if (selectedFilter || brightness !== 0 || contrast !== 0 || blur !== 0) {
       let sourceBytes: Uint8Array
       if (editedImageBytes) {
         sourceBytes = editedImageBytes
@@ -259,6 +259,7 @@ function App() {
         null,
         selectedFilter,
         { brightness, contrast },
+        blur,
       )
       downloadBlob(result, filename, inputFormat)
       return
@@ -270,7 +271,7 @@ function App() {
       const buf = await originalFile.arrayBuffer()
       downloadBlob(new Uint8Array(buf), filename, inputFormat)
     }
-  }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, contrast, processImage])
+  }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, contrast, blur, processImage])
 
   const handleReset = useCallback(() => {
     if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)

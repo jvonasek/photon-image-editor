@@ -52,6 +52,7 @@ export function usePhoton() {
     naturalDimensions: ImageDimensions | null,
     filterName: string | null = null,
     adjustments: Adjustments | null = null,
+    blur: number = 0,
   ): Promise<Uint8Array> => {
     const photon = photonRef.current
     if (!photon) throw new Error('Photon not initialized')
@@ -90,6 +91,10 @@ export function usePhoton() {
 
       if (filterName) {
         applyFilter(photon, img, filterName)
+      }
+
+      if (blur > 0) {
+        photon.gaussian_blur(img, blur)
       }
 
       let result: Uint8Array

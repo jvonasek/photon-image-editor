@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-05-16 -- RAZ-28 (implemented)
+
+- RAZ-27 wiring is now present (blur state, slider, live preview path). Extended the final-export pipeline (`processImage` in `usePhoton`) to accept a `blur` argument and apply `gaussian_blur` after the active filter, mirroring preview ordering.
+- Updated `handleDownload` in `App.tsx`: included `blur !== 0` in the reprocess gate, pass `blur` into `processImage`, and added `blur` to the callback's deps.
+- Validation: `bunx tsc -b` clean. `bun run lint` reports 3 pre-existing errors unrelated to this change (ResizeControls effect, ui/button, ui/toggle). `bun run build` fails loading vite config under bun (vite-plugin-top-level-await env issue) — pre-existing, not caused by this change.
+- Status: DONE.
+
 ## 2026-05-16 -- RAZ-28 (re-check #5)
 
 - Re-verified RAZ-28 blocker. `grep -ri blur apps/web/src` returns zero matches; `grep -ri blur` across the whole repo also returns zero matches. RAZ-27 prerequisite (state/UI/live-preview wiring for blur) still not implemented. Implementing RAZ-27 here would violate one-task-per-loop.
