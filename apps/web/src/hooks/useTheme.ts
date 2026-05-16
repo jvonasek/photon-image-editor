@@ -1,9 +1,8 @@
-import { useCallback, useLayoutEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
 export type Theme = 'light' | 'dark' | 'system'
 
 const STORAGE_KEY = 'theme'
-const THEME_ORDER: Theme[] = ['light', 'dark', 'system']
 
 function isTheme(value: unknown): value is Theme {
   return value === 'light' || value === 'dark' || value === 'system'
@@ -28,7 +27,7 @@ function applyDarkClass(isDark: boolean): void {
   }
 }
 
-export function useTheme(): { theme: Theme; cycleTheme: () => void } {
+export function useTheme(): { theme: Theme; setTheme: (theme: Theme) => void } {
   const [theme, setTheme] = useState<Theme>(readStoredTheme)
 
   useLayoutEffect(() => {
@@ -61,13 +60,5 @@ export function useTheme(): { theme: Theme; cycleTheme: () => void } {
     }
   }, [theme])
 
-  const cycleTheme = useCallback(() => {
-    setTheme((current) => {
-      const index = THEME_ORDER.indexOf(current)
-      const next = THEME_ORDER[(index + 1) % THEME_ORDER.length]
-      return next
-    })
-  }, [])
-
-  return { theme, cycleTheme }
+  return { theme, setTheme }
 }
