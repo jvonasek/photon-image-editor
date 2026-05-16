@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-05-16 -- RAZ-28 (re-check #2)
+
+- Re-verified RAZ-28 blocker. `grep -ri blur apps/web/src` returns zero matches. `usePhoton.ts` `processImage` still takes no blur parameter; `App.tsx` has no `blur` state; `AdjustmentsControls.tsx` has no blur control. RAZ-27 prerequisite (wire blur through state, UI, live-preview) remains unimplemented.
+- No code changes this iteration; implementing RAZ-27 here would violate one-task-per-loop.
+- Status: BLOCKED.
+
 ## 2026-05-16 -- RAZ-12
 
 - Implemented `useTheme` hook at `apps/web/src/hooks/useTheme.ts`.
