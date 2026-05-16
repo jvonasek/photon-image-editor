@@ -66,6 +66,7 @@ def fetch_in_progress_issues(project_id: str) -> list[dict]:
                 filter: {{
                     project: {{ id: {{ eq: $projectId }} }}
                     state: {{ type: {{ in: ["started"] }} }}
+                    labels: {{ name: {{ eq: "ready-for-agent" }} }}
                 }}
                 orderBy: createdAt
                 first: 100
@@ -91,6 +92,7 @@ def fetch_candidate_issues(project_id: str) -> list[dict]:
                 filter: {{
                     project: {{ id: {{ eq: $projectId }} }}
                     state: {{ type: {{ in: ["backlog", "unstarted"] }} }}
+                    labels: {{ name: {{ eq: "ready-for-agent" }} }}
                 }}
                 orderBy: createdAt
                 first: 100
