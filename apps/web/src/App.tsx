@@ -26,6 +26,7 @@ function App() {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null)
   const [brightness, setBrightness] = useState(0)
   const [contrast, setContrast] = useState(0)
+  const [blur, setBlur] = useState(0)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const prevEditedUrl = useRef<string | null>(null)
@@ -58,11 +59,12 @@ function App() {
     brightnessValue: number,
     contrastValue: number,
     filterName: string | null,
+    blurValue: number,
     sourceBytesOverride?: Uint8Array,
   ) => {
     if (!originalFile) return
 
-    if (brightnessValue === 0 && contrastValue === 0 && !filterName) {
+    if (brightnessValue === 0 && contrastValue === 0 && !filterName && blurValue === 0) {
       clearPreview()
       return
     }
@@ -90,6 +92,7 @@ function App() {
           brightnessValue,
           contrastValue,
           filterName,
+          blurValue,
         )
         if (myId !== previewReqId.current) return
         const url = bytesToObjectUrl(previewBytes, 'image/png')
@@ -125,6 +128,7 @@ function App() {
     setSelectedFilter(null)
     setBrightness(0)
     setContrast(0)
+    setBlur(0)
     clearPreview()
   }, [clearPreview])
 
@@ -161,15 +165,15 @@ function App() {
       const newDims = await getImageDimensions(newUrl)
       setCurrentDimensions(newDims)
 
-      if (brightness !== 0 || contrast !== 0 || selectedFilter) {
-        schedulePreview(brightness, contrast, selectedFilter, result)
+      if (brightness !== 0 || contrast !== 0 || selectedFilter || blur !== 0) {
+        schedulePreview(brightness, contrast, selectedFilter, blur, result)
       } else {
         clearPreview()
       }
     } finally {
       setIsProcessing(false)
     }
-  }, [originalFile, editedImageBytes, currentDimensions, inputFormat, processImage, selectedFilter, brightness, contrast, schedulePreview, clearPreview])
+  }, [originalFile, editedImageBytes, currentDimensions, inputFormat, processImage, selectedFilter, brightness, contrast, blur, schedulePreview, clearPreview])
 
   const handleResize = useCallback(async (dimensions: ImageDimensions) => {
     if (!originalFile) return
@@ -202,30 +206,35 @@ function App() {
       setEditedImageUrl(newUrl)
       setCurrentDimensions(dimensions)
 
-      if (brightness !== 0 || contrast !== 0 || selectedFilter) {
-        schedulePreview(brightness, contrast, selectedFilter, result)
+      if (brightness !== 0 || contrast !== 0 || selectedFilter || blur !== 0) {
+        schedulePreview(brightness, contrast, selectedFilter, blur, result)
       } else {
         clearPreview()
       }
     } finally {
       setIsProcessing(false)
     }
-  }, [originalFile, editedImageBytes, inputFormat, processImage, selectedFilter, brightness, contrast, schedulePreview, clearPreview])
+  }, [originalFile, editedImageBytes, inputFormat, processImage, selectedFilter, brightness, contrast, blur, schedulePreview, clearPreview])
 
   const handleFilterChange = useCallback((name: string | null) => {
     setSelectedFilter(name)
-    schedulePreview(brightness, contrast, name)
-  }, [brightness, contrast, schedulePreview])
+    schedulePreview(brightness, contrast, name, blur)
+  }, [brightness, contrast, blur, schedulePreview])
 
   const handleBrightnessChange = useCallback((value: number) => {
     setBrightness(value)
-    schedulePreview(value, contrast, selectedFilter)
-  }, [contrast, selectedFilter, schedulePreview])
+    schedulePreview(value, contrast, selectedFilter, blur)
+  }, [contrast, selectedFilter, blur, schedulePreview])
 
   const handleContrastChange = useCallback((value: number) => {
     setContrast(value)
-    schedulePreview(brightness, value, selectedFilter)
-  }, [brightness, selectedFilter, schedulePreview])
+    schedulePreview(brightness, value, selectedFilter, blur)
+  }, [brightness, selectedFilter, blur, schedulePreview])
+
+  const handleBlurChange = useCallback((value: number) => {
+    setBlur(value)
+    schedulePreview(brightness, contrast, selectedFilter, value)
+  }, [brightness, contrast, selectedFilter, schedulePreview])
 
   const handleDownload = useCallback(async () => {
     if (!originalFile) return
@@ -271,6 +280,7 @@ function App() {
     setSelectedFilter(null)
     setBrightness(0)
     setContrast(0)
+    setBlur(0)
     clearPreview()
     if (originalDimensions) setCurrentDimensions(originalDimensions)
   }, [originalDimensions, clearPreview])
@@ -302,11 +312,13 @@ function App() {
           selectedFilter={selectedFilter}
           brightness={brightness}
           contrast={contrast}
+          blur={blur}
           onCrop={handleCrop}
           onResize={handleResize}
           onFilterChange={handleFilterChange}
           onBrightnessChange={handleBrightnessChange}
           onContrastChange={handleContrastChange}
+          onBlurChange={handleBlurChange}
           onDownload={handleDownload}
           onReset={handleReset}
         />

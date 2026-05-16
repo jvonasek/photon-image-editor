@@ -84,3 +84,12 @@
 - Re-verified blocker on RAZ-28. Grep for `blur` (case-insensitive) over `apps/web/src` still returns zero matches. `usePhoton.ts` has no blur parameter; `App.tsx` has no `blur` state; `AdjustmentsControls.tsx` has no blur control. RAZ-27 still not implemented.
 - No code changes made this iteration. Existing blockers entry remains accurate.
 - Status: BLOCKED.
+
+## 2026-05-16 -- RAZ-27
+
+- Added "Blur" slider (0-100, step 1, default 0) as third row in `AdjustmentsControls.tsx`, matching Brightness/Contrast pattern (click numeric readout to reset).
+- `usePhoton.ts`: extended `applyAdjustmentsPreview` with `blur: number` parameter; applies `photon.gaussian_blur(img, blur)` after the active filter (so filtered look is softened). `processImage` (final export) intentionally unchanged — final-export integration is the follow-up slice (RAZ-28).
+- `App.tsx`: added `blur` state, threaded through `schedulePreview` (now takes `blurValue`); preview no-op gate requires `blur === 0` along with neutral brightness/contrast/no filter; blur reset to 0 on new upload and on Reset; preserved across Crop/Resize re-renders.
+- `ImageEditor.tsx`: forwards `blur` / `onBlurChange` props.
+- Validation: `bunx tsc -b --noEmit` -> clean. `bun run lint` -> 3 pre-existing errors only (ResizeControls effect rule, ui/button + ui/toggle fast-refresh). `bun run build` -> vite plugin env error (`vite-plugin-top-level-await` + bun) is a pre-existing tooling issue, unrelated to this change; typecheck stage passes.
+- Status: DONE.
