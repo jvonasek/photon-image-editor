@@ -10,7 +10,8 @@
         "WebFetch(domain:github.com)",
         "mcp__playwright__*",
         "mcp__claude-in-chrome__*",
-        "Bash(linear *)"
+        "Bash(linear *)",
+        "Bash(git push:*)"
       ],
       "deny": [
         "Bash(sudo *)",
@@ -18,9 +19,6 @@
         "Read(./.env)",
         "Read(~/.ssh/**)",
         "Read(~/.aws/**)"
-      ],
-      "ask": [
-        "Bash(git push:*)"
       ],
       "defaultMode": "acceptEdits"
     },
