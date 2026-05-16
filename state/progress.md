@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-05-16 -- RAZ-28 (re-check #5)
+
+- Re-verified RAZ-28 blocker. `grep -ri blur apps/web/src` returns zero matches; `grep -ri blur` across the whole repo also returns zero matches. RAZ-27 prerequisite (state/UI/live-preview wiring for blur) still not implemented. Implementing RAZ-27 here would violate one-task-per-loop.
+- No code changes.
+- Status: BLOCKED.
+
 ## 2026-05-16 -- RAZ-28 (re-check #4)
 
 - Re-verified RAZ-28 blocker. `grep -rn blur apps/web/src` still returns zero matches; `usePhoton.ts` `processImage`/`applyAdjustmentsPreview` take no blur arg; `App.tsx` has no `blur` state; `AdjustmentsControls.tsx` has no blur control. RAZ-27 prerequisite remains unimplemented.
