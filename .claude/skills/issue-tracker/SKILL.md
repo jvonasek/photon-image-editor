@@ -39,6 +39,7 @@ Assume the user does not know what these terms mean. Each section starts with a 
 
 Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
 
+- **Linear** — issues live in the Linear issue tracker, project "HDR" (uses the `linear` CLI)
 - **GitHub** — issues live in the repo's GitHub Issues (uses the `gh` CLI)
 - **GitLab** — issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
 - **Local markdown** — issues live as files under `.scratch/<feature>/` in this repo (good for solo projects or repos without a remote)

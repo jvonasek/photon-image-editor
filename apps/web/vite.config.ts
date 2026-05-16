@@ -7,6 +7,12 @@ import topLevelAwait from 'vite-plugin-top-level-await'
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), wasm(), topLevelAwait()],
+  build: {
+    target: 'esnext',
+  },
+  esbuild: {
+    target: 'esnext',
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -18,8 +18,14 @@ export function getExtension(format: ImageFormat): string {
   }
 }
 
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const buffer = new ArrayBuffer(bytes.byteLength)
+  new Uint8Array(buffer).set(bytes)
+  return buffer
+}
+
 export function downloadBlob(bytes: Uint8Array, filename: string, mimeType: string) {
-  const blob = new Blob([bytes], { type: mimeType })
+  const blob = new Blob([toArrayBuffer(bytes)], { type: mimeType })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -29,7 +35,7 @@ export function downloadBlob(bytes: Uint8Array, filename: string, mimeType: stri
 }
 
 export function bytesToObjectUrl(bytes: Uint8Array, mimeType: string): string {
-  const blob = new Blob([bytes], { type: mimeType })
+  const blob = new Blob([toArrayBuffer(bytes)], { type: mimeType })
   return URL.createObjectURL(blob)
 }
 
