@@ -91,7 +91,7 @@ def fetch_candidate_issues(project_id: str) -> list[dict]:
             issues(
                 filter: {{
                     project: {{ id: {{ eq: $projectId }} }}
-                    state: {{ type: {{ in: ["backlog", "unstarted"] }} }}
+                    state: {{ type: {{ in: ["unstarted"] }} }}
                     labels: {{ name: {{ eq: "ready-for-agent" }} }}
                 }}
                 orderBy: createdAt

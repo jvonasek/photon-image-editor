@@ -245,31 +245,45 @@ After the task is complete and validation passes, you MUST commit and push your 
 ### Steps:
 
 1. **Ensure you are on `main`**:
-   ```
+
+   ```bash
    git checkout main
    ```
 
-2. **Stage all changed files** relevant to the task:
+2. **Pull the latest changes** from remote:
+
+   ```bash
+   git pull origin main
    ```
+
+3. **Stage all changed files** relevant to the task:
+
+   ```bash
    git add <file1> <file2> ...
    ```
+
    Do not use `git add -A` or `git add .` — stage only files you changed for this task.
 
-3. **Commit** with a conventional scoped message:
-   ```
+4. **Commit** with a conventional scoped message:
+
+   ```bash
    git commit -m "feat(module): short description"
    ```
-   Examples:
-   - `feat(projects): add follow endpoint`
-   - `fix(listings): validate compensation type`
-   - `test(profiles): cover recruiter visibility rules`
 
-4. **Push** directly to main:
-   ```
+   Examples:
+
+   * `feat(projects): add follow endpoint`
+   * `fix(listings): validate compensation type`
+   * `test(profiles): cover recruiter visibility rules`
+
+5. **Push** directly to main:
+
+   ```bash
    git push origin main
    ```
 
-5. **Verify** the push succeeded. If it fails, include the error in your final output.
+6. **Verify** the push succeeded. If it fails, include the error in your final output.
+
 
 Do not create feature branches — push directly to main.
 Do not create unrelated commits.

@@ -39,6 +39,7 @@ def graphql(query: str, variables: dict | None = None) -> dict:
         headers={
             "Content-Type": "application/json",
             "Authorization": api_key,
+            "public-file-urls-expire-in": "3600",
         },
         method="POST",
     )

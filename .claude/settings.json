@@ -6,12 +6,14 @@
     },
     "permissions": {
       "allow": [
+        "WebFetch(domain:uploads.linear.app)",
         "WebFetch(domain:registry.npmjs.org)",
         "WebFetch(domain:github.com)",
         "mcp__playwright__*",
         "mcp__claude-in-chrome__*",
         "Bash(linear *)",
-        "Bash(git push:*)"
+        "Bash(git push:*)",
+        "Bash(git pull:*)"
       ],
       "deny": [
         "Bash(sudo *)",

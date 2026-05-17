@@ -300,10 +300,12 @@ Make concise, reviewable changes. **You MUST commit and push before finishing th
 ### Required steps after validation passes:
 
 1. Ensure you are on `main`
-2. Stage only the files you changed for this task (no `git add -A` or `git add .`)
-3. Commit with a conventional scoped message
-4. Push to remote with `git push origin main`
-5. Verify the push succeeded
+2. Pull the latest changes with `git pull origin main`
+3. Stage only the files you changed for this task (no `git add -A` or `git add .`)
+4. Commit with a conventional scoped message
+5. Push to remote with `git push origin main`
+6. Verify the push succeeded
+
 
 Commit message style:
 - `feat(projects): add project follow endpoint`
