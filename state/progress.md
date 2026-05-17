@@ -100,3 +100,10 @@
 - `ImageEditor.tsx`: forwards `blur` / `onBlurChange` props.
 - Validation: `bunx tsc -b --noEmit` -> clean. `bun run lint` -> 3 pre-existing errors only (ResizeControls effect rule, ui/button + ui/toggle fast-refresh). `bun run build` -> vite plugin env error (`vite-plugin-top-level-await` + bun) is a pre-existing tooling issue, unrelated to this change; typecheck stage passes.
 - Status: DONE.
+
+## 2026-05-17 -- RAZ-29
+
+- Added a centered footer in `apps/web/src/App.tsx` with the literal copy from the issue attachment: "All image processing is done locally. None of your files leave your device.". Retrieved the text by fetching the Linear-hosted image via the `LINEAR_API_KEY`-authenticated `uploads.linear.app` URL (previous iteration's blocker was that the URL returned 401 to unauthenticated requests).
+- Layout: switched the root `<div>` from a plain `min-h-screen` block to `min-h-screen flex flex-col`, wrapped the existing dropzone/editor content in a `<main className="flex-1">`, and appended a `<footer>` with `text-center text-sm text-muted-foreground`. The flex-1 main pushes the footer to the bottom on short pages and lets it sit naturally below the content on tall pages.
+- Validation: could not run — neither `bun` nor `node` is on PATH in this loop's environment, so `bun run lint` / `bun run build` / `tsc` are not invocable. Change is markup-only JSX in one file, no type or runtime surface changed.
+- Status: DONE.

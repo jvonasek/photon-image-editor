@@ -289,41 +289,47 @@ function App() {
   const displayUrl = previewUrl ?? editedImageUrl ?? originalImageUrl
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6">
+    <div className="min-h-screen bg-background text-foreground flex flex-col p-6">
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Photon Image Editor</h1>
         <ThemeToggle />
       </header>
 
-      {!isReady && (
-        <p className="text-center text-sm text-muted-foreground">Loading image engine...</p>
-      )}
+      <main className="flex-1">
+        {!isReady && (
+          <p className="text-center text-sm text-muted-foreground">Loading image engine...</p>
+        )}
 
-      {isReady && !displayUrl && (
-        <ImageDropzone onFileAccepted={handleFileAccepted} />
-      )}
+        {isReady && !displayUrl && (
+          <ImageDropzone onFileAccepted={handleFileAccepted} />
+        )}
 
-      {isReady && displayUrl && currentDimensions && originalFile && (
-        <ImageEditor
-          imageUrl={displayUrl}
-          currentDimensions={currentDimensions}
-          format={inputFormat}
-          fileName={originalFile.name}
-          isProcessing={isProcessing}
-          selectedFilter={selectedFilter}
-          brightness={brightness}
-          contrast={contrast}
-          blur={blur}
-          onCrop={handleCrop}
-          onResize={handleResize}
-          onFilterChange={handleFilterChange}
-          onBrightnessChange={handleBrightnessChange}
-          onContrastChange={handleContrastChange}
-          onBlurChange={handleBlurChange}
-          onDownload={handleDownload}
-          onReset={handleReset}
-        />
-      )}
+        {isReady && displayUrl && currentDimensions && originalFile && (
+          <ImageEditor
+            imageUrl={displayUrl}
+            currentDimensions={currentDimensions}
+            format={inputFormat}
+            fileName={originalFile.name}
+            isProcessing={isProcessing}
+            selectedFilter={selectedFilter}
+            brightness={brightness}
+            contrast={contrast}
+            blur={blur}
+            onCrop={handleCrop}
+            onResize={handleResize}
+            onFilterChange={handleFilterChange}
+            onBrightnessChange={handleBrightnessChange}
+            onContrastChange={handleContrastChange}
+            onBlurChange={handleBlurChange}
+            onDownload={handleDownload}
+            onReset={handleReset}
+          />
+        )}
+      </main>
+
+      <footer className="mt-6 text-center text-sm text-muted-foreground">
+        All image processing is done locally. None of your files leave your device.
+      </footer>
     </div>
   )
 }
