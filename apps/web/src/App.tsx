@@ -3,6 +3,7 @@ import type { PixelCrop } from 'react-image-crop'
 import { ImageDropzone } from '@/components/ImageDropzone'
 import { ImageEditor } from '@/components/ImageEditor'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/button'
 import { usePhoton } from '@/hooks/usePhoton'
 import { detectFormat, readFileAsArrayBuffer, getExtension, downloadBlob, bytesToObjectUrl, getImageDimensions } from '@/utils/image'
 import type { ImageFormat, ImageDimensions } from '@/types'
@@ -288,20 +289,26 @@ function App() {
 
   const displayUrl = previewUrl ?? editedImageUrl ?? originalImageUrl
 
+  const canDownload = Boolean(displayUrl) && !isProcessing
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col p-6">
-      <header className="flex items-center justify-between mb-6">
+    <div className="h-screen bg-background text-foreground flex flex-col">
+      <header className="flex items-center justify-between px-6 py-3 border-b shrink-0">
         <h1 className="text-2xl font-bold">Photon Image Editor</h1>
         <ThemeToggle />
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 min-h-0 flex">
         {!isReady && (
-          <p className="text-center text-sm text-muted-foreground">Loading image engine...</p>
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-sm text-muted-foreground">Loading image engine...</p>
+          </div>
         )}
 
         {isReady && !displayUrl && (
-          <ImageDropzone onFileAccepted={handleFileAccepted} />
+          <div className="flex-1 flex items-center justify-center p-6">
+            <ImageDropzone onFileAccepted={handleFileAccepted} />
+          </div>
         )}
 
         {isReady && displayUrl && currentDimensions && originalFile && (
@@ -321,14 +328,20 @@ function App() {
             onBrightnessChange={handleBrightnessChange}
             onContrastChange={handleContrastChange}
             onBlurChange={handleBlurChange}
-            onDownload={handleDownload}
             onReset={handleReset}
           />
         )}
       </main>
 
-      <footer className="mt-6 text-center text-sm text-muted-foreground">
-        All image processing is done locally. None of your files leave your device.
+      <footer className="flex items-stretch border-t shrink-0">
+        <div className="flex-1 flex items-center px-6 py-3 text-sm text-muted-foreground">
+          All image processing is done locally. None of your files leave your device.
+        </div>
+        <div className="w-64 shrink-0 border-l px-4 py-3 flex items-center">
+          <Button onClick={handleDownload} disabled={!canDownload} className="w-full">
+            Download
+          </Button>
+        </div>
       </footer>
     </div>
   )

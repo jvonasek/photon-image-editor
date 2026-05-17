@@ -26,7 +26,6 @@ interface ImageEditorProps {
   onBrightnessChange: (value: number) => void
   onContrastChange: (value: number) => void
   onBlurChange: (value: number) => void
-  onDownload: () => void
   onReset: () => void
 }
 
@@ -46,7 +45,6 @@ export function ImageEditor({
   onBrightnessChange,
   onContrastChange,
   onBlurChange,
-  onDownload,
   onReset,
 }: ImageEditorProps) {
   const [crop, setCrop] = useState<Crop>()
@@ -72,24 +70,25 @@ export function ImageEditor({
   const formatLabel = format === 'image/jpeg' ? 'JPEG' : format === 'image/webp' ? 'WebP' : 'PNG'
 
   return (
-    <div className="flex gap-6 w-full max-w-6xl mx-auto">
-      <div className="flex-1 min-w-0">
+    <div className="flex-1 min-h-0 flex w-full">
+      <div className="flex-1 min-w-0 min-h-0 flex items-center justify-center overflow-hidden p-4">
         <ReactCrop
           crop={crop}
           onChange={(c) => setCrop(c)}
           onComplete={(c) => setCompletedCrop(c)}
           disabled={isProcessing}
+          className="max-h-full max-w-full"
         >
           <img
             ref={imgRef}
             src={imageUrl}
             alt="Editor preview"
-            className="max-w-full max-h-[70vh] object-contain"
+            className="max-w-full max-h-[calc(100vh-12rem)] object-contain"
           />
         </ReactCrop>
       </div>
 
-      <div className="w-64 shrink-0 space-y-4">
+      <div className="w-64 shrink-0 border-l overflow-y-auto p-4 space-y-4">
         <div>
           <h3 className="text-sm font-medium">Info</h3>
           <p className="text-xs text-muted-foreground mt-1">
@@ -139,14 +138,9 @@ export function ImageEditor({
 
         <Separator />
 
-        <div className="space-y-2">
-          <Button onClick={onDownload} disabled={isProcessing} className="w-full">
-            Download
-          </Button>
-          <Button variant="outline" onClick={onReset} disabled={isProcessing} className="w-full">
-            Reset to Original
-          </Button>
-        </div>
+        <Button variant="outline" onClick={onReset} disabled={isProcessing} className="w-full">
+          Reset to Original
+        </Button>
 
         {isProcessing && (
           <p className="text-xs text-muted-foreground text-center">Processing...</p>
