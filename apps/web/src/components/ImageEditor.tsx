@@ -88,7 +88,7 @@ export function ImageEditor({
         </ReactCrop>
       </div>
 
-      <div className="w-64 shrink-0 border-l overflow-y-auto p-4 space-y-4">
+      <div className="w-80 shrink-0 border-l overflow-y-auto p-4 space-y-4">
         <div>
           <h3 className="text-sm font-medium">Info</h3>
           <p className="text-xs text-muted-foreground mt-1">

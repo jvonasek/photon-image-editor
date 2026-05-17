@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PixelCrop } from 'react-image-crop'
+import { AppMenubar } from '@/components/AppMenubar'
 import { ImageDropzone } from '@/components/ImageDropzone'
 import { ImageEditor } from '@/components/ImageEditor'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -274,6 +275,24 @@ function App() {
     }
   }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, contrast, blur, processImage])
 
+  const handleNewImage = useCallback(() => {
+    if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
+    if (prevOriginalUrl.current) URL.revokeObjectURL(prevOriginalUrl.current)
+    prevEditedUrl.current = null
+    prevOriginalUrl.current = null
+    setOriginalFile(null)
+    setOriginalImageUrl(null)
+    setOriginalDimensions(null)
+    setEditedImageBytes(null)
+    setEditedImageUrl(null)
+    setCurrentDimensions(null)
+    setSelectedFilter(null)
+    setBrightness(0)
+    setContrast(0)
+    setBlur(0)
+    clearPreview()
+  }, [clearPreview])
+
   const handleReset = useCallback(() => {
     if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
     prevEditedUrl.current = null
@@ -294,7 +313,7 @@ function App() {
   return (
     <div className="h-screen bg-background text-foreground flex flex-col">
       <header className="flex items-center justify-between px-6 py-3 border-b shrink-0">
-        <h1 className="text-2xl font-bold">Photon Image Editor</h1>
+        <AppMenubar hasImage={Boolean(originalFile)} onNewImage={handleNewImage} />
         <ThemeToggle />
       </header>
 
@@ -337,11 +356,13 @@ function App() {
         <div className="flex-1 flex items-center px-6 py-3 text-sm text-muted-foreground">
           All image processing is done locally. None of your files leave your device.
         </div>
-        <div className="w-64 shrink-0 border-l px-4 py-3 flex items-center">
-          <Button onClick={handleDownload} disabled={!canDownload} className="w-full">
-            Download
-          </Button>
-        </div>
+        {displayUrl && (
+          <div className="w-80 shrink-0 border-l px-4 py-3 flex items-center">
+            <Button onClick={handleDownload} disabled={!canDownload} className="w-full">
+              Download
+            </Button>
+          </div>
+        )}
       </footer>
     </div>
   )
