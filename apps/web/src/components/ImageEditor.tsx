@@ -8,6 +8,7 @@ import { AdjustmentsControls } from './AdjustmentsControls'
 import { CropControls } from './CropControls'
 import { FilterControls } from './FilterControls'
 import { ResizeControls } from './ResizeControls'
+import { SliceControls } from './SliceControls'
 import type { ImageFormat, ImageDimensions } from '@/types'
 
 interface ImageEditorProps {
@@ -20,12 +21,16 @@ interface ImageEditorProps {
   brightness: number
   contrast: number
   blur: number
+  sliceCount: number
+  isLandscape: boolean
   onCrop: (crop: PixelCrop, displayDimensions: ImageDimensions) => void
   onResize: (dimensions: ImageDimensions) => void
   onFilterChange: (name: string | null) => void
   onBrightnessChange: (value: number) => void
   onContrastChange: (value: number) => void
   onBlurChange: (value: number) => void
+  onSliceCountChange: (delta: -1 | 1) => void
+  onSliceDownload: () => void
   onReset: () => void
 }
 
@@ -39,12 +44,16 @@ export function ImageEditor({
   brightness,
   contrast,
   blur,
+  sliceCount,
+  isLandscape,
   onCrop,
   onResize,
   onFilterChange,
   onBrightnessChange,
   onContrastChange,
   onBlurChange,
+  onSliceCountChange,
+  onSliceDownload,
   onReset,
 }: ImageEditorProps) {
   const [crop, setCrop] = useState<Crop>()
@@ -134,6 +143,16 @@ export function ImageEditor({
           currentDimensions={currentDimensions}
           onApply={onResize}
           isProcessing={isProcessing}
+        />
+
+        <Separator />
+
+        <SliceControls
+          sliceCount={sliceCount}
+          isLandscape={isLandscape}
+          isProcessing={isProcessing}
+          onSliceCountChange={onSliceCountChange}
+          onDownload={onSliceDownload}
         />
 
         <Separator />

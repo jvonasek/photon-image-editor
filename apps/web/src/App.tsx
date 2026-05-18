@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import JSZip from 'jszip'
 import type { PixelCrop } from 'react-image-crop'
 import { AppMenubar } from '@/components/AppMenubar'
 import { ImageDropzone } from '@/components/ImageDropzone'
@@ -12,7 +13,7 @@ import type { ImageFormat, ImageDimensions } from '@/types'
 const PREVIEW_DEBOUNCE_MS = 75
 
 function App() {
-  const { isReady, processImage, applyAdjustmentsPreview } = usePhoton()
+  const { isReady, processImage, applyAdjustmentsPreview, sliceImage } = usePhoton()
 
   const [originalFile, setOriginalFile] = useState<File | null>(null)
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null)
@@ -30,6 +31,16 @@ function App() {
   const [contrast, setContrast] = useState(0)
   const [blur, setBlur] = useState(0)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [sliceCount, setSliceCount] = useState(2)
+
+  const isLandscape = currentDimensions !== null && currentDimensions.width > currentDimensions.height
+
+  useEffect(() => {
+    if (!currentDimensions) return
+    const sliceWidth = Math.round(currentDimensions.height * 0.8)
+    if (sliceWidth <= 0) return
+    setSliceCount(Math.max(2, Math.round(currentDimensions.width / sliceWidth)))
+  }, [currentDimensions])
 
   const prevEditedUrl = useRef<string | null>(null)
   const prevOriginalUrl = useRef<string | null>(null)
@@ -275,6 +286,50 @@ function App() {
     }
   }, [originalFile, editedImageBytes, inputFormat, selectedFilter, brightness, contrast, blur, processImage])
 
+  const handleSliceCountChange = useCallback((delta: -1 | 1) => {
+    setSliceCount((prev) => Math.max(2, prev + delta))
+  }, [])
+
+  const handleSliceDownload = useCallback(async () => {
+    if (!originalFile || !currentDimensions) return
+    setIsProcessing(true)
+    try {
+      let sourceBytes: Uint8Array
+      if (editedImageBytes) {
+        sourceBytes = editedImageBytes
+      } else {
+        const buf = await readFileAsArrayBuffer(originalFile)
+        sourceBytes = new Uint8Array(buf)
+      }
+
+      const adjustments = (brightness !== 0 || contrast !== 0)
+        ? { brightness, contrast }
+        : null
+
+      const slices = await sliceImage(
+        sourceBytes,
+        sliceCount,
+        currentDimensions,
+        inputFormat,
+        adjustments,
+        selectedFilter,
+        blur,
+      )
+
+      const baseName = originalFile.name.replace(/\.[^.]+$/, '')
+      const padWidth = String(sliceCount).length
+      const zip = new JSZip()
+      slices.forEach((bytes, i) => {
+        const index = String(i + 1).padStart(padWidth, '0')
+        zip.file(`${baseName}_${index}.jpg`, bytes)
+      })
+      const zipBytes = await zip.generateAsync({ type: 'uint8array' })
+      downloadBlob(zipBytes, `${baseName}.zip`, 'application/zip')
+    } finally {
+      setIsProcessing(false)
+    }
+  }, [originalFile, editedImageBytes, currentDimensions, sliceCount, inputFormat, brightness, contrast, selectedFilter, blur, sliceImage])
+
   const handleNewImage = useCallback(() => {
     if (prevEditedUrl.current) URL.revokeObjectURL(prevEditedUrl.current)
     if (prevOriginalUrl.current) URL.revokeObjectURL(prevOriginalUrl.current)
@@ -341,12 +396,16 @@ function App() {
             brightness={brightness}
             contrast={contrast}
             blur={blur}
+            sliceCount={sliceCount}
+            isLandscape={isLandscape}
             onCrop={handleCrop}
             onResize={handleResize}
             onFilterChange={handleFilterChange}
             onBrightnessChange={handleBrightnessChange}
             onContrastChange={handleContrastChange}
             onBlurChange={handleBlurChange}
+            onSliceCountChange={handleSliceCountChange}
+            onSliceDownload={handleSliceDownload}
             onReset={handleReset}
           />
         )}
