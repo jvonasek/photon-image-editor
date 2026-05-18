@@ -39,6 +39,35 @@ export function bytesToObjectUrl(bytes: Uint8Array, mimeType: string): string {
   return URL.createObjectURL(blob)
 }
 
+export interface SliceRect {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+}
+
+export interface SlicePlan {
+  centerOffset: number
+  sliceWidth: number
+  slices: SliceRect[]
+}
+
+export function computeSlicePlan(width: number, height: number, n: number): SlicePlan {
+  const sliceWidth = Math.round(height * 0.8)
+  const cropWidth = n * sliceWidth
+  const centerOffset = Math.round((width - cropWidth) / 2)
+  const slices: SliceRect[] = []
+  for (let i = 0; i < n; i++) {
+    slices.push({
+      x1: centerOffset + i * sliceWidth,
+      y1: 0,
+      x2: centerOffset + (i + 1) * sliceWidth,
+      y2: height,
+    })
+  }
+  return { centerOffset, sliceWidth, slices }
+}
+
 export function getImageDimensions(url: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const img = new Image()

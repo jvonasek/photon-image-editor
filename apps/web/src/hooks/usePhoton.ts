@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PixelCrop } from 'react-image-crop'
 import type { ImageFormat, ImageDimensions } from '@/types'
 import { applyFilter } from '@/lib/filters'
+import { computeSlicePlan } from '@/utils/image'
 
 type PhotonModule = typeof import('@silvia-odwyer/photon')
 
@@ -142,5 +143,45 @@ export function usePhoton() {
     }
   }, [])
 
-  return { isReady, processImage, applyAdjustmentsPreview }
+  const sliceImage = useCallback(async (
+    sourceBytes: Uint8Array,
+    n: number,
+    dims: ImageDimensions,
+    _format: ImageFormat,
+    adjustments: Adjustments | null,
+    filterName: string | null,
+    blur: number,
+  ): Promise<Uint8Array[]> => {
+    const photon = photonRef.current
+    if (!photon) throw new Error('Photon not initialized')
+
+    const plan = computeSlicePlan(dims.width, dims.height, n)
+    const sourceImg = photon.PhotonImage.new_from_byteslice(sourceBytes)
+
+    try {
+      const results: Uint8Array[] = []
+      for (const rect of plan.slices) {
+        const sliceImg = photon.crop(sourceImg, rect.x1, rect.y1, rect.x2, rect.y2)
+        try {
+          if (adjustments) {
+            applyAdjustments(photon, sliceImg, adjustments.brightness, adjustments.contrast)
+          }
+          if (filterName) {
+            applyFilter(photon, sliceImg, filterName)
+          }
+          if (blur > 0) {
+            photon.gaussian_blur(sliceImg, blur)
+          }
+          results.push(sliceImg.get_bytes_jpeg(85))
+        } finally {
+          sliceImg.free()
+        }
+      }
+      return results
+    } finally {
+      sourceImg.free()
+    }
+  }, [])
+
+  return { isReady, processImage, applyAdjustmentsPreview, sliceImage }
 }
