@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import ReactCrop from 'react-image-crop'
 import type { Crop, PixelCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
@@ -9,6 +9,7 @@ import { CropControls } from './CropControls'
 import { FilterControls } from './FilterControls'
 import { ResizeControls } from './ResizeControls'
 import { SliceControls } from './SliceControls'
+import { SliceOverlay } from './SliceOverlay'
 import type { ImageFormat, ImageDimensions } from '@/types'
 
 interface ImageEditorProps {
@@ -58,7 +59,20 @@ export function ImageEditor({
 }: ImageEditorProps) {
   const [crop, setCrop] = useState<Crop>()
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
+  const [displaySize, setDisplaySize] = useState<{ width: number; height: number }>({ width: 0, height: 0 })
   const imgRef = useRef<HTMLImageElement>(null)
+
+  const updateDisplaySize = useCallback(() => {
+    if (!imgRef.current) return
+    setDisplaySize({ width: imgRef.current.width, height: imgRef.current.height })
+  }, [])
+
+  useEffect(() => {
+    if (!imgRef.current || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => updateDisplaySize())
+    observer.observe(imgRef.current)
+    return () => observer.disconnect()
+  }, [updateDisplaySize, imageUrl])
 
   const handleApplyCrop = useCallback(() => {
     if (!completedCrop || !imgRef.current) return
@@ -93,7 +107,17 @@ export function ImageEditor({
             src={imageUrl}
             alt="Editor preview"
             className="max-w-full max-h-[calc(100vh-12rem)] object-contain"
+            onLoad={updateDisplaySize}
           />
+          {isLandscape && (
+            <SliceOverlay
+              naturalWidth={currentDimensions.width}
+              naturalHeight={currentDimensions.height}
+              displayWidth={displaySize.width}
+              displayHeight={displaySize.height}
+              sliceCount={sliceCount}
+            />
+          )}
         </ReactCrop>
       </div>
 
