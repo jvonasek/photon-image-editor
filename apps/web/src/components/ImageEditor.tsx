@@ -4,11 +4,7 @@ import type { Crop, PixelCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { AdjustmentsControls } from './AdjustmentsControls'
-import { CropControls } from './CropControls'
-import { FilterControls } from './FilterControls'
-import { ResizeControls } from './ResizeControls'
-import { SliceControls } from './SliceControls'
+import { SidebarToolbar } from './SidebarToolbar'
 import { SliceOverlay } from './SliceOverlay'
 import type { ImageFormat, ImageDimensions } from '@/types'
 
@@ -121,8 +117,8 @@ export function ImageEditor({
         </ReactCrop>
       </div>
 
-      <div className="w-80 shrink-0 border-l overflow-y-auto p-4 space-y-4">
-        <div>
+      <div className="w-80 shrink-0 border-l flex flex-col">
+        <div className="p-4 shrink-0">
           <h3 className="text-sm font-medium">Info</h3>
           <p className="text-xs text-muted-foreground mt-1">
             {fileName}
@@ -134,60 +130,37 @@ export function ImageEditor({
 
         <Separator />
 
-        <FilterControls
-          value={selectedFilter}
-          onChange={onFilterChange}
-          disabled={isProcessing}
-        />
-
-        <Separator />
-
-        <AdjustmentsControls
+        <SidebarToolbar
+          selectedFilter={selectedFilter}
           brightness={brightness}
           contrast={contrast}
           blur={blur}
-          onBrightnessChange={onBrightnessChange}
-          onContrastChange={onContrastChange}
-          onBlurChange={onBlurChange}
-          disabled={isProcessing}
-        />
-
-        <Separator />
-
-        <CropControls
-          crop={completedCrop}
-          onApply={handleApplyCrop}
-          onClear={handleClearCrop}
-          isProcessing={isProcessing}
-        />
-
-        <Separator />
-
-        <ResizeControls
-          currentDimensions={currentDimensions}
-          onApply={onResize}
-          isProcessing={isProcessing}
-        />
-
-        <Separator />
-
-        <SliceControls
           sliceCount={sliceCount}
           isLandscape={isLandscape}
           isProcessing={isProcessing}
+          currentDimensions={currentDimensions}
+          completedCrop={completedCrop}
+          onFilterChange={onFilterChange}
+          onBrightnessChange={onBrightnessChange}
+          onContrastChange={onContrastChange}
+          onBlurChange={onBlurChange}
+          onCropApply={handleApplyCrop}
+          onCropClear={handleClearCrop}
+          onResize={onResize}
           onSliceCountChange={onSliceCountChange}
-          onDownload={onSliceDownload}
+          onSliceDownload={onSliceDownload}
         />
 
         <Separator />
 
-        <Button variant="outline" onClick={onReset} disabled={isProcessing} className="w-full">
-          Reset to Original
-        </Button>
-
-        {isProcessing && (
-          <p className="text-xs text-muted-foreground text-center">Processing...</p>
-        )}
+        <div className="p-4 space-y-2 shrink-0">
+          <Button variant="outline" onClick={onReset} disabled={isProcessing} className="w-full">
+            Reset to Original
+          </Button>
+          {isProcessing && (
+            <p className="text-xs text-muted-foreground text-center">Processing...</p>
+          )}
+        </div>
       </div>
     </div>
   )
