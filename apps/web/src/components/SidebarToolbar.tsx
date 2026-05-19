@@ -1,5 +1,6 @@
 import type { PixelCrop } from 'react-image-crop'
-import { Crop as CropIcon, Maximize2, Scissors, SlidersHorizontal } from 'lucide-react'
+import { Crop as CropIcon, Scissors, SlidersHorizontal } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { AdjustmentsControls } from './AdjustmentsControls'
@@ -76,26 +77,14 @@ export function SidebarToolbar({
           <Tooltip>
             <TooltipTrigger asChild>
               <TabsTrigger
-                value="crop"
-                aria-label="Crop"
+                value="crop-resize"
+                aria-label="Crop & Resize"
                 className={TAB_TRIGGER_CLASS}
               >
                 <CropIcon className="size-4" />
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="right">Crop</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <TabsTrigger
-                value="resize"
-                aria-label="Resize"
-                className={TAB_TRIGGER_CLASS}
-              >
-                <Maximize2 className="size-4" />
-              </TabsTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="right">Resize</TooltipContent>
+            <TooltipContent side="right">Crop & Resize</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -132,8 +121,8 @@ export function SidebarToolbar({
         </TabsContent>
 
         <TabsContent
-          value="crop"
-          className="flex-1 min-w-0 min-h-0 overflow-y-auto p-4 mt-0"
+          value="crop-resize"
+          className="flex-1 min-w-0 min-h-0 overflow-y-auto p-4 mt-0 space-y-4"
         >
           <CropControls
             crop={completedCrop}
@@ -141,12 +130,7 @@ export function SidebarToolbar({
             onClear={onCropClear}
             isProcessing={isProcessing}
           />
-        </TabsContent>
-
-        <TabsContent
-          value="resize"
-          className="flex-1 min-w-0 min-h-0 overflow-y-auto p-4 mt-0"
-        >
+          <Separator />
           <ResizeControls
             currentDimensions={currentDimensions}
             onApply={onResize}
