@@ -12,6 +12,8 @@ import { SliceControls } from './SliceControls'
 import type { ImageDimensions } from '@/types'
 
 interface SidebarToolbarProps {
+  activeTab: string
+  onActiveTabChange: (value: string) => void
   selectedFilter: string | null
   brightness: number
   contrast: number
@@ -38,6 +40,8 @@ const TAB_TRIGGER_CLASS =
   'h-10 w-10 p-0 rounded-md data-[state=active]:bg-accent data-[state=active]:border-border'
 
 export function SidebarToolbar({
+  activeTab,
+  onActiveTabChange,
   selectedFilter,
   brightness,
   contrast,
@@ -62,7 +66,8 @@ export function SidebarToolbar({
   return (
     <TooltipProvider delayDuration={300}>
       <Tabs
-        defaultValue="adjustments"
+        value={activeTab}
+        onValueChange={onActiveTabChange}
         orientation="horizontal"
         className="flex-1 min-h-0 flex flex-col gap-0"
       >

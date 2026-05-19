@@ -56,6 +56,7 @@ export function ImageEditor({
   const [crop, setCrop] = useState<Crop>()
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [displaySize, setDisplaySize] = useState<{ width: number; height: number }>({ width: 0, height: 0 })
+  const [activeTab, setActiveTab] = useState('adjustments')
   const imgRef = useRef<HTMLImageElement>(null)
 
   const updateDisplaySize = useCallback(() => {
@@ -105,7 +106,7 @@ export function ImageEditor({
             className="max-w-full max-h-[calc(100vh-12rem)] object-contain"
             onLoad={updateDisplaySize}
           />
-          {isLandscape && (
+          {isLandscape && activeTab === 'slice' && (
             <SliceOverlay
               naturalWidth={currentDimensions.width}
               naturalHeight={currentDimensions.height}
@@ -119,6 +120,8 @@ export function ImageEditor({
 
       <div className="w-80 shrink-0 border-l flex flex-col">
         <SidebarToolbar
+          activeTab={activeTab}
+          onActiveTabChange={setActiveTab}
           selectedFilter={selectedFilter}
           brightness={brightness}
           contrast={contrast}
