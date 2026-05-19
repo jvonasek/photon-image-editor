@@ -118,18 +118,6 @@ export function ImageEditor({
       </div>
 
       <div className="w-80 shrink-0 border-l flex flex-col">
-        <div className="p-4 shrink-0">
-          <h3 className="text-sm font-medium">Info</h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            {fileName}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {currentDimensions.width} x {currentDimensions.height} px &middot; {formatLabel}
-          </p>
-        </div>
-
-        <Separator />
-
         <SidebarToolbar
           selectedFilter={selectedFilter}
           brightness={brightness}
@@ -140,6 +128,8 @@ export function ImageEditor({
           isProcessing={isProcessing}
           currentDimensions={currentDimensions}
           completedCrop={completedCrop}
+          fileName={fileName}
+          formatLabel={formatLabel}
           onFilterChange={onFilterChange}
           onBrightnessChange={onBrightnessChange}
           onContrastChange={onContrastChange}

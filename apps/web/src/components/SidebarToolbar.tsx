@@ -1,5 +1,5 @@
 import type { PixelCrop } from 'react-image-crop'
-import { Crop as CropIcon, SlidersHorizontal } from 'lucide-react'
+import { Crop as CropIcon, Info, SlidersHorizontal } from 'lucide-react'
 import { InstagramIcon } from './icons/InstagramIcon'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -21,6 +21,8 @@ interface SidebarToolbarProps {
   isProcessing: boolean
   currentDimensions: ImageDimensions
   completedCrop: PixelCrop | undefined
+  fileName: string
+  formatLabel: string
   onFilterChange: (name: string | null) => void
   onBrightnessChange: (value: number) => void
   onContrastChange: (value: number) => void
@@ -45,6 +47,8 @@ export function SidebarToolbar({
   isProcessing,
   currentDimensions,
   completedCrop,
+  fileName,
+  formatLabel,
   onFilterChange,
   onBrightnessChange,
   onContrastChange,
@@ -99,6 +103,18 @@ export function SidebarToolbar({
             </TooltipTrigger>
             <TooltipContent side="bottom">Instagram</TooltipContent>
           </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger
+                value="info"
+                aria-label="Info"
+                className={TAB_TRIGGER_CLASS}
+              >
+                <Info className="size-4" />
+              </TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Info</TooltipContent>
+          </Tooltip>
         </TabsList>
 
         <TabsContent
@@ -150,6 +166,17 @@ export function SidebarToolbar({
             onSliceCountChange={onSliceCountChange}
             onDownload={onSliceDownload}
           />
+        </TabsContent>
+
+        <TabsContent
+          value="info"
+          className="flex-1 min-w-0 min-h-0 overflow-y-auto p-4 mt-0"
+        >
+          <h3 className="text-sm font-medium">Info</h3>
+          <p className="text-xs text-muted-foreground mt-1">{fileName}</p>
+          <p className="text-xs text-muted-foreground">
+            {currentDimensions.width} x {currentDimensions.height} px &middot; {formatLabel}
+          </p>
         </TabsContent>
       </Tabs>
     </TooltipProvider>
