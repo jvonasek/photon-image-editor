@@ -59,10 +59,10 @@ export function SidebarToolbar({
     <TooltipProvider delayDuration={300}>
       <Tabs
         defaultValue="adjustments"
-        orientation="vertical"
-        className="flex-1 min-h-0 flex flex-row gap-0"
+        orientation="horizontal"
+        className="flex-1 min-h-0 flex flex-col gap-0"
       >
-        <TabsList className="h-auto w-12 shrink-0 flex-col items-stretch justify-start gap-1 rounded-none border-r bg-transparent p-1">
+        <TabsList className="h-12 w-auto shrink-0 flex-row items-stretch justify-start gap-1 rounded-none border-b bg-transparent p-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <TabsTrigger
@@ -73,7 +73,7 @@ export function SidebarToolbar({
                 <SlidersHorizontal className="size-4" />
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="right">Adjustments</TooltipContent>
+            <TooltipContent side="bottom">Adjustments</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -85,7 +85,7 @@ export function SidebarToolbar({
                 <CropIcon className="size-4" />
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="right">Crop & Resize</TooltipContent>
+            <TooltipContent side="bottom">Crop & Resize</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -97,7 +97,7 @@ export function SidebarToolbar({
                 <InstagramIcon className="size-4" strokeWidth={2} />
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="right">Instagram</TooltipContent>
+            <TooltipContent side="bottom">Instagram</TooltipContent>
           </Tooltip>
         </TabsList>
 
