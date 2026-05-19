@@ -1,5 +1,6 @@
 import type { PixelCrop } from 'react-image-crop'
-import { Crop as CropIcon, Scissors, SlidersHorizontal } from 'lucide-react'
+import { Crop as CropIcon, SlidersHorizontal } from 'lucide-react'
+import { InstagramIcon } from './icons/InstagramIcon'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -90,13 +91,13 @@ export function SidebarToolbar({
             <TooltipTrigger asChild>
               <TabsTrigger
                 value="slice"
-                aria-label="Slice"
+                aria-label="Instagram"
                 className={TAB_TRIGGER_CLASS}
               >
-                <Scissors className="size-4" />
+                <InstagramIcon className="size-4" strokeWidth={2} />
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="right">Slice</TooltipContent>
+            <TooltipContent side="right">Instagram</TooltipContent>
           </Tooltip>
         </TabsList>
 
