@@ -37,7 +37,7 @@ interface SidebarToolbarProps {
 }
 
 const TAB_TRIGGER_CLASS =
-  'h-10 w-10 p-0 rounded-md data-[state=active]:bg-accent data-[state=active]:border-border'
+  'h-10 w-10 p-0 rounded-md text-muted-foreground hover:text-foreground data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:border-border data-[state=active]:shadow-sm'
 
 export function SidebarToolbar({
   activeTab,
